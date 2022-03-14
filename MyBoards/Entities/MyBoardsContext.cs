@@ -30,6 +30,13 @@ namespace MyBoards.Entities
                 eb.Property(wi => wi.EndDate).HasPrecision(3);
                 eb.Property(wi => wi.Activity).HasMaxLength(200);
                 eb.Property(wi => wi.RemaningWork).HasPrecision(14, 2);
+                eb.Property(wi => wi.Priority).HasDefaultValue(1);
+            });
+
+            modelBuilder.Entity<Comment>(eb =>
+            {
+                eb.Property(x => x.CreatedDate).HasDefaultValueSql("getutcdate()");
+                eb.Property(x => x.UpdatedDate).ValueGeneratedOnUpdate();
             });
         }
     }
