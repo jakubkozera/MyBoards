@@ -9,28 +9,31 @@ using System.Threading.Tasks;
 
 namespace MyBoards.Entities
 {
-    public class WorkItem
+    public class Epic  : WorkItem
     {
-        public int Id { get; set; }
-
-        public WorkItemState State { get; set; }
-        public int StateId { get; set; }
-
-        public string Area { get; set; }
-
-        public string IterationPath { get; set; }
-        public int Priority { get; set; }
-        // Epic
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        // Issue
+    }
+
+    public class Issue : WorkItem
+    {
         public decimal Efford { get; set; }
-        // Task
+    }
+
+    public class Task : WorkItem
+    {
         public string Activity { get; set; }
         public decimal RemaningWork { get; set; }
+    }
 
-
-        public string Type { get; set; }
+    public abstract class WorkItem
+    {
+        public int Id { get; set; }
+        public WorkItemState State { get; set; }
+        public int StateId { get; set; }
+        public string Area { get; set; }
+        public string IterationPath { get; set; }
+        public int Priority { get; set; }
 
         public List<Comment> Comments { get; set; } = new List<Comment>();
         public User Author { get; set; }
