@@ -60,10 +60,11 @@ if(!users.Any())
 
 app.MapGet("data", async (MyBoardsContext db) =>
 {
-    var authorsCommentCounts = await db.Comments
-    .GroupBy(c => c.AuthorId)
-    .Select(g => new { g.Key, Count = g.Count()})
-    .ToListAsync();
+    var authorsCommentCountsQuery = db.Comments
+        .GroupBy(c => c.AuthorId)
+        .Select(g => new { g.Key, Count = g.Count() });
+
+    var authorsCommentCounts = await authorsCommentCountsQuery.ToListAsync();
 
     var topAuthor = authorsCommentCounts
         .First(a => a.Count == authorsCommentCounts.Max(acc => acc.Count));
