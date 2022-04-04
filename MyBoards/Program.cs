@@ -70,8 +70,8 @@ app.MapGet("data", async (MyBoardsContext db) =>
     var states = db.WorkItemStates
     .AsNoTracking()
     .ToList();
-    
-    
+
+    var entries = db.ChangeTracker.Entries();
     //var userComments = await db.Comments.Where(c => c.AuthorId == user.Id).ToListAsync();
 
     return states;
