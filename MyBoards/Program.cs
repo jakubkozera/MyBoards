@@ -67,15 +67,14 @@ if(!users.Any())
 
 app.MapGet("data", async (MyBoardsContext db) =>
 {
-    var user = await db.Users
-    .Include(u => u.Comments).ThenInclude(c => c.WorkItem)
-    .Include(u => u.Address)
-    .FirstAsync(u => u.Id == Guid.Parse("68366DBE-0809-490F-CC1D-08DA10AB0E61"));
+    var states = db.WorkItemStates
+    .AsNoTracking()
+    .ToList();
     
     
     //var userComments = await db.Comments.Where(c => c.AuthorId == user.Id).ToListAsync();
 
-    return user;
+    return states;
 });
 
 app.MapPost("update", async (MyBoardsContext db) =>
