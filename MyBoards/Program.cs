@@ -67,28 +67,8 @@ if(!users.Any())
 
 app.MapGet("data", async (MyBoardsContext db) =>
 {
-    var minWorkItemsCount = "85";
-
-    var states = db.WorkItemStates
-    .FromSqlInterpolated($@"
-SELECT wis.Id, wis.Value
-FROM WorkItemStates wis
-JOIN WorkItems wi on wi.StateId = wis.Id
-GROUP BY wis.Id, wis.Value
-HAVING COUNT(*) > {minWorkItemsCount}"
-)
-    .ToList();
-
-    db.Database.ExecuteSqlRaw(@"
-  UPDATE Comments
-  SET UpdatedDate = GETDATE()
-  WHERE AuthorId = '2073271A-3DFC-4A63-CBE5-08DA10AB0E61'
-");
-
-    var entries = db.ChangeTracker.Entries();
-    //var userComments = await db.Comments.Where(c => c.AuthorId == user.Id).ToListAsync();
-
-    return states;
+    var topAuthors = db.ViewTopAuthors.ToList();
+    return topAuthors;
 });
 
 app.MapPost("update", async (MyBoardsContext db) =>
