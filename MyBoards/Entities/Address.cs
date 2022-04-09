@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,13 @@ namespace MyBoards.Entities
         public string PostalCode { get; set; }
         public User User { get; set; }
         public Guid UserId { get; set; }
-
+        public Coordinate Coordinate { get; set; }
     }
+
+    public class Coordinate 
+    {
+        public decimal? Longitude { get; set; }
+        public decimal? Latitude { get; set; }
+    }
+
 }

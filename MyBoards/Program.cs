@@ -67,8 +67,8 @@ if(!users.Any())
 
 app.MapGet("data", async (MyBoardsContext db) =>
 {
-    var topAuthors = db.ViewTopAuthors.ToList();
-    return topAuthors;
+    var addresses = db.Addresses.Where(a => a.Coordinate.Latitude > 10).ToList();
+    return addresses;
 });
 
 app.MapPost("update", async (MyBoardsContext db) =>
