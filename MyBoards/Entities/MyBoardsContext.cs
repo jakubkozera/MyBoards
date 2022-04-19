@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyBoards.Entities.Configurations;
 using MyBoards.Entities.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -28,10 +29,10 @@ namespace MyBoards.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<WorkItemState>()
-                 .Property(s => s.Value)
-                 .IsRequired()
-                 .HasMaxLength(60);
+            modelBuilder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);
+
+
+
 
            modelBuilder.Entity<Epic>()
                 .Property(wi => wi.EndDate)
@@ -49,42 +50,6 @@ namespace MyBoards.Entities
                 .Property(wi => wi.Efford)
                 .HasColumnType("decimal(5,2)");
 
-            modelBuilder.Entity<WorkItem>(eb =>
-            {
-                eb.HasOne(w => w.State)
-                .WithMany()
-                .HasForeignKey(w => w.StateId);
-
-                eb.Property(x => x.Area).HasColumnType("varchar(200)");
-                eb.Property(wi => wi.IterationPath).HasColumnName("Iteration_Path");
-    
-                eb.Property(wi => wi.Priority).HasDefaultValue(1);
-                eb.HasMany(w => w.Comments)
-                .WithOne(c => c.WorkItem)
-                .HasForeignKey(c => c.WorkItemId);
-
-                eb.HasOne(w => w.Author)
-                .WithMany(u => u.WorkItems)
-                .HasForeignKey(w => w.AuthorId);
-
-                eb.HasMany(w => w.Tags)
-                .WithMany(t => t.WorkItems)
-                .UsingEntity<WorkItemTag>(
-                    w => w.HasOne(wit => wit.Tag)
-                    .WithMany()
-                    .HasForeignKey(wit => wit.TagId),
-
-                    w => w.HasOne(wit => wit.WorkItem)
-                    .WithMany()
-                    .HasForeignKey(wit => wit.WorkItemId),
-
-                    wit =>
-                    {
-                        wit.HasKey(x => new { x.TagId, x.WorkItemId });
-                        wit.Property(x => x.PublicationDate).HasDefaultValueSql("getutcdate()");
-                    });
-            });
-
             modelBuilder.Entity<Comment>(eb =>
             {
                 eb.Property(x => x.CreatedDate).HasDefaultValueSql("getutcdate()");
@@ -100,11 +65,6 @@ namespace MyBoards.Entities
                 .WithOne(a => a.User)
                 .HasForeignKey<Address>(a => a.UserId);
 
-            modelBuilder.Entity<WorkItemState>()
-                .HasData(new WorkItemState() { Id = 1, Value = "To Do" },
-                new WorkItemState() { Id = 2, Value = "Doing" },
-                new WorkItemState() { Id = 3, Value = "Done" });
-
             modelBuilder.Entity<Tag>()
                 .HasData(new Tag() { Id = 1, Value = "Web" },
                 new Tag() { Id = 2, Value = "UI" },
@@ -119,13 +79,7 @@ namespace MyBoards.Entities
                 eb.HasNoKey();
             });
 
-
-            modelBuilder.Entity<Address>()
-                .OwnsOne(a => a.Coordinate, cmb =>
-                {
-                    cmb.Property(c => c.Latitude).HasPrecision(18, 7);
-                    cmb.Property(c => c.Longitude).HasPrecision(18, 7);
-                });
+                            
         }
     }
 }
