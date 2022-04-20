@@ -31,9 +31,6 @@ namespace MyBoards.Entities
         {
             modelBuilder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);
 
-
-
-
            modelBuilder.Entity<Epic>()
                 .Property(wi => wi.EndDate)
                 .HasPrecision(3);
@@ -59,11 +56,6 @@ namespace MyBoards.Entities
                     .HasForeignKey(c => c.AuthorId)
                     .OnDelete(DeleteBehavior.ClientCascade);
             });
-
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Address)
-                .WithOne(a => a.User)
-                .HasForeignKey<Address>(a => a.UserId);
 
             modelBuilder.Entity<Tag>()
                 .HasData(new Tag() { Id = 1, Value = "Web" },
