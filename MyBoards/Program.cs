@@ -170,6 +170,13 @@ app.MapPost("create", async (MyBoardsContext db) =>
 
 app.MapDelete("delete", async (MyBoardsContext db) =>
 {
+    var users = db.Users
+        .Where(u => u.FullName == "John Doe")
+        .ToList();
+
+
+
+
     var user = await db.Users
         .Include(u => u.Comments)
         .FirstAsync(u => u.Id == Guid.Parse("4EBB526D-2196-41E1-CBDA-08DA10AB0E61"));
