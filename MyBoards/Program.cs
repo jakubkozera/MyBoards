@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
+using MyBoards;
 using MyBoards.Entities;
 using System.Text.Json.Serialization;
 
@@ -11,7 +12,6 @@ builder.Services.Configure<JsonOptions>(options =>
 {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
-
 
 builder.Services.AddDbContext<MyBoardsContext>(
         option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
@@ -34,8 +34,10 @@ if (pendingMigrations.Any())
     dbContext.Database.Migrate();
 }
 
+DataGenerator.Seed(dbContext);
+
 var users = dbContext.Users.ToList();
-if(!users.Any())
+if (!users.Any())
 {
     var user1 = new User()
     {
@@ -64,14 +66,12 @@ if(!users.Any())
     dbContext.SaveChanges();
 }
 
-
 app.MapGet("data", async (MyBoardsContext db) =>
 {
     var states = db.WorkItemStates
     .AsNoTracking()
     .ToList();
-    
-    
+
     //var userComments = await db.Comments.Where(c => c.AuthorId == user.Id).ToListAsync();
 
     return states;
@@ -84,11 +84,10 @@ app.MapPost("update", async (MyBoardsContext db) =>
     var rejectedState = await db.WorkItemStates.FirstAsync(a => a.Value == "Rejected");
 
     epic.State = rejectedState;
-    
+
     await db.SaveChangesAsync();
 
     return epic;
-
 });
 
 app.MapPost("create", async (MyBoardsContext db) =>
@@ -97,9 +96,8 @@ app.MapPost("create", async (MyBoardsContext db) =>
     {
         Id = Guid.Parse("b323dd7c-776a-4cf6-a92a-12df154b4a2c"),
         City = "Kraków",
-        Country= "Poland",
+        Country = "Poland",
         Street = "Długa"
-
     };
 
     var user = new User()
@@ -121,12 +119,9 @@ app.MapDelete("delete", async (MyBoardsContext db) =>
         .Include(u => u.Comments)
         .FirstAsync(u => u.Id == Guid.Parse("4EBB526D-2196-41E1-CBDA-08DA10AB0E61"));
 
-   
-
     db.Users.Remove(user);
 
     await db.SaveChangesAsync();
 });
-
 
 app.Run();
