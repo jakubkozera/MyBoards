@@ -48,27 +48,37 @@ app.MapPut("updateLinq2Db", async (NorthwindContext db) =>
     });
 });
 
+app.MapPut("update-ef7", async (NorthwindContext db) =>
+{
+    await db.Employees
+    .Where(e => e.HireDate > new DateTime(2021, 6, 1))
+    .ExecuteUpdateAsync(s => 
+        s.SetProperty(e => e.Notes, "New employee"));
+});
+
+
 app.MapGet("getOrderDetails", async (NorthwindContext db) =>
 {
-    Order order = await GetOrder(46, db, o => o.OrderDetails);
-    return new { OrderId = order.OrderId, Details = order.OrderDetails};
+    Order order = await GetOrder(46, db, o => new Order { CustomerId = o.CustomerId, OrderDetails = o.OrderDetails },
+        o => o.OrderDetails);
+    return order;
 });
 
-app.MapGet("getOrderWithShipper", async (NorthwindContext db) =>
-{
-    Order order = await GetOrder(46, db, o => o.ShipViaNavigation);
-    return new { OrderId = order.OrderId, ShipVia = order.ShipVia, Shipper = order.ShipViaNavigation };
-});
+//app.MapGet("getOrderWithShipper", async (NorthwindContext db) =>
+//{
+//    Order order = await GetOrder(46, db, o => o.ShipViaNavigation);
+//    return new { OrderId = order.OrderId, ShipVia = order.ShipVia, Shipper = order.ShipViaNavigation };
+//});
 
-app.MapGet("getOrderWithCustomer", async (NorthwindContext db) =>
-{
-    Order order = await GetOrder(46, db, o => o.Customer);
-    return new { OrderId = order.OrderId, Customer = order.Customer};
-});
+//app.MapGet("getOrderWithCustomer", async (NorthwindContext db) =>
+//{
+//    Order order = await GetOrder(46, db, o => o.Customer);
+//    return new { OrderId = order.OrderId, Customer = order.Customer};
+//});
 
 app.Run();
 
-async Task<Order> GetOrder(int orderId, NorthwindContext db, params Expression<Func<Order, object>>[] includes)
+async Task<Order> GetOrder(int orderId, NorthwindContext db, Expression<Func<Order, Order>> select, params Expression<Func<Order, object>>[] includes)
 {
 
     var baseQuery = db.Orders
@@ -81,6 +91,8 @@ async Task<Order> GetOrder(int orderId, NorthwindContext db, params Expression<F
             baseQuery = baseQuery.Include(include);
         }
     }
+
+    baseQuery = baseQuery.Select(select);
 
     var order = await baseQuery
         .FirstAsync();
